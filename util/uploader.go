@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"mime/multipart"
 	"os"
 
@@ -14,6 +15,7 @@ import (
 var (
 	AwsAccessKey = os.Getenv("AWS_ACCESS_KEY")
 	AwsSecretKey = os.Getenv("AWS_SECRET_KEY")
+	AwsBucket    = os.Getenv("AWS_BUCKET")
 )
 
 func connectAWS() *session.Session {
@@ -33,14 +35,14 @@ func UploadFile(file *multipart.FileHeader) (*s3manager.UploadOutput, error) {
 	buffer, err := file.Open()
 
 	if err != nil {
-		fmt.Println(err)
+		log.Error(fmt.Sprintf("Error opening file: %s", err))
 	}
 	defer buffer.Close()
 
 	uploader := s3manager.NewUploader(connectAWS())
 
 	data, err := uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String("cloudvest"),   // Bucket to be used
+		Bucket: aws.String(AwsBucket),     // Bucket to be used
 		Key:    aws.String(file.Filename), // Name of the file to be saved
 		Body:   buffer,                    // File
 	})

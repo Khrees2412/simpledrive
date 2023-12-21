@@ -85,7 +85,7 @@ func (as *authService) IssueToken(u *model.User) (*types.TokenResponse, error) {
 		Email:  u.Email,
 		UserId: u.ID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    u.ID,
+			Issuer:    "simpledrive",
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
 			Subject:   "access_token",
 			IssuedAt:  jwt.NewNumericDate(t),

@@ -39,4 +39,8 @@ type (
 		ExpiresAt   int64  `json:"expires_at"`
 		Issuer      string `json:"issuer"`
 	}
+
+	CreateFolderRequest struct {
+		Name string `json:"name" validate:"required"`
+	}
 )

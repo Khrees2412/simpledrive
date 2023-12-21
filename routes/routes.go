@@ -7,16 +7,5 @@ import (
 
 func RegisterRoutes(router *fiber.App) {
 	controller.NewAuthController().RegisterRoutes(router)
+	controller.NewFileController().RegisterRoutes(router)
 }
-
-//private.Post("/create-folder", controller.CreateFolder)
-//
-//private.Post("/upload/:folder", controller.StoreFileInFolder)
-//
-//private.Post("/upload", controller.StoreFile)
-//
-//private.Get("/download/:filename", controller.DownloadFile)
-//
-//private.Get("/view/files", controller.GetFile)
-//
-//private.Delete("/:fileID", controller.DeleteFile)

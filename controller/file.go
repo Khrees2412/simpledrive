@@ -1,5 +1,69 @@
 package controller
 
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/khrees2412/simpledrive/service"
+	"github.com/khrees2412/simpledrive/types"
+	"github.com/khrees2412/simpledrive/util"
+)
+
+type IFileController interface {
+	Upload(ctx *fiber.Ctx) error
+	Download(ctx *fiber.Ctx) error
+	RegisterRoutes(app *fiber.App)
+}
+
+type fileController struct {
+	fileService service.IFileService
+}
+
+// NewFileController instantiates File Controller
+func NewFileController() IFileController {
+	return &fileController{
+		fileService: service.NewFileService(),
+	}
+}
+
+func (ctl *fileController) RegisterRoutes(app *fiber.App) {
+	file := app.Group("/v1/file")
+
+	file.Post("/upload", util.SecureAuth(), ctl.Upload)
+	file.Post("/download", util.SecureAuth(), ctl.Download)
+}
+
+func (ctl *fileController) Upload(ctx *fiber.Ctx) error {
+	userId, err := util.UserFromContext(ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(types.GenericResponse{
+			Success: false,
+			Message: err.Error(),
+		})
+	}
+	file, e := ctx.FormFile("file")
+	if e != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(types.GenericResponse{
+			Success: false,
+			Message: e.Error(),
+		})
+	}
+	err = ctl.fileService.Upload(userId, file)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(types.GenericResponse{
+			Success: false,
+			Message: err.Error(),
+		})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(types.GenericResponse{
+		Success: true,
+		Message: "File uploaded successfully",
+		Data:    file.Filename,
+	})
+}
+
+func (ctl *fileController) Download(ctx *fiber.Ctx) error {
+	return nil
+}
+
 //
 //import (
 //	"fmt"
@@ -94,12 +158,7 @@ package controller
 //	}
 //	filesize := file.Size
 //	filename := file.Filename
-//	if filesize > int64(maxByteSize) {
-//		return c.JSON(types.GenericResponse{
-//			Success: false,
-//			Message: "The file size is too large, try something below 200mb",
-//		})
-//	}
+
 //	data, err := util.UploadFile(file)
 //
 //	if err != nil {

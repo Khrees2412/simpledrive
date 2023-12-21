@@ -9,6 +9,7 @@ import (
 type IFolderRepository interface {
 	Create(folder *model.Folder) error
 	FindByFolderId(folderId string) (*model.Folder, error)
+	FindByFolderName(folderName string) (*model.Folder, error)
 	FindAllFoldersByUserId(userId string) ([]model.Folder, error)
 	Update(folder *model.Folder) error
 	Delete(folderId string) error
@@ -32,6 +33,14 @@ func (r *folderRepo) Create(folder *model.Folder) error {
 func (r *folderRepo) FindByFolderId(folderId string) (*model.Folder, error) {
 	var folder model.Folder
 	if err := r.db.Where("folder_id = ?", folderId).First(&folder).Error; err != nil {
+		return nil, err
+	}
+
+	return &folder, nil
+}
+func (r *folderRepo) FindByFolderName(folderName string) (*model.Folder, error) {
+	var folder model.Folder
+	if err := r.db.Where("folder_name = ?", folderName).First(&folder).Error; err != nil {
 		return nil, err
 	}
 

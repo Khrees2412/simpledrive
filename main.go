@@ -44,7 +44,6 @@ func main() {
 		port = "8000"
 	}
 	dbUrl := os.Getenv("DATABASE_URL")
-	fmt.Println("url: ", dbUrl)
 	dbConnection, err := database.ConnectDB(dbUrl)
 
 	if err != nil {

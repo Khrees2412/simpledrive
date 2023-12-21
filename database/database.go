@@ -34,8 +34,8 @@ func DB() *gorm.DB {
 
 func MigrateAll(db *gorm.DB) error {
 	return db.AutoMigrate(
-		model.User{},
 		model.Folder{},
 		model.File{},
+		model.User{},
 	)
 }
