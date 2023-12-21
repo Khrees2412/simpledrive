@@ -1,5 +1,4 @@
-[WIP]
-Cloudvest - A simple google-drive-like tool 
+Simpledrive - A simple google-drive-like tool 
 
 This application safely and securely stores your file in the cloud.
 

@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/google/uuid"
+	_ "github.com/khrees2412/simpledrive/config"
 	"github.com/khrees2412/simpledrive/database"
 	"github.com/khrees2412/simpledrive/routes"
 	"log"
@@ -43,6 +44,7 @@ func main() {
 		port = "8000"
 	}
 	dbUrl := os.Getenv("DATABASE_URL")
+	fmt.Println("url: ", dbUrl)
 	dbConnection, err := database.ConnectDB(dbUrl)
 
 	if err != nil {
