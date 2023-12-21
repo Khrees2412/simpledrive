@@ -15,9 +15,8 @@ Stack:
 ## Prerequisites
 
 -   Go compiler (download at https://golang.org)
--   Docker
 
-Base Endpoint: https://cloudvest.herokuapp.com/api/v1
+Base Endpoint: https://simpledrive.onrender.com
 
 Auth endpoints:
 

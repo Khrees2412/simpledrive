@@ -1,4 +1,4 @@
-package models
+package model
 
 type File struct {
 	Base

@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"time"
@@ -10,17 +10,10 @@ import (
 
 type User struct {
 	Base
-	Name     string `json:"name" gorm:"unique"`
-	Email    string `json:"email" gorm:"unique"`
-	Password string `json:"-"`
-}
-
-// UserErrors represent the error format for user routes
-type UserErrors struct {
-	Err      bool   `json:"error"`
-	Email    string `json:"email"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	FirstName string `json:"first_name" gorm:"unique"`
+	LastName  string `json:"last_name" gorm:"unique"`
+	Email     string `json:"email" gorm:"unique"`
+	Password  string `json:"-"`
 }
 
 // Claims represent the structure of the JWT token
@@ -37,6 +30,7 @@ func GenerateISOString() string {
 // Base contains common columns for all tables
 type Base struct {
 	ID        string `gorm:"primaryKey" json:"id"`
+	Count     int    `json:"count"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }

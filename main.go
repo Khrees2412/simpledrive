@@ -1,56 +1,70 @@
 package main
 
 import (
-	"github.com/sirupsen/logrus"
-	"simpledrive/database"
-	"simpledrive/routes"
-
-	"os"
-
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/joho/godotenv"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/google/uuid"
+	"github.com/khrees2412/simpledrive/database"
+	"github.com/khrees2412/simpledrive/routes"
+	"log"
+	"net/http"
+	"os"
 )
 
-func init() {
-	// loads values from .env into the system
-	if err := godotenv.Load(); err != nil {
-		logrus.Println("No .env file found")
-	}
-	logrus.Println("Environment variables successfully loaded. Starting application...")
-}
-
 func main() {
+
 	app := fiber.New()
-
-	//Connect Database
-	database.Connect()
-
-	//Setup routes
-	routes.Setup(app)
-
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Simpledrive app set")
-	})
-	//Activate CORS
+	app.Use(requestid.New(requestid.Config{
+		Header: "Simpledrive-Request-ID",
+		Generator: func() string {
+			return uuid.NewString()
+		},
+	}))
+	app.Use(logger.New(logger.Config{
+		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n",
+	}))
 	app.Use(cors.New(cors.Config{
+		AllowHeaders:     "Origin,Content-Type,Accept,Content-Length,Accept-Language,Accept-Encoding,Connection,Access-Control-Allow-Origin,Authorization",
+		AllowOrigins:     "*",
 		AllowCredentials: true,
+		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
 	}))
 
-	// 404 Handler
-	app.Use(func(c *fiber.Ctx) error {
-		return c.SendStatus(404) // => 404 "Not Found"
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("You're home, yaay!!")
 	})
-	// Get the PORT from host env
+
 	port := os.Getenv("PORT")
 
 	if port == "" {
-		// local development port
 		port = "8000"
 	}
+	dbUrl := os.Getenv("DATABASE_URL")
+	dbConnection, err := database.ConnectDB(dbUrl)
 
-	err := app.Listen(":" + port)
 	if err != nil {
-		panic(err)
+		log.Fatalf("db connection error: %v", err)
 	}
+
+	err = database.MigrateAll(dbConnection)
+
+	if err != nil {
+		log.Fatalf("migration error: %v", err)
+	}
+	routes.RegisterRoutes(app)
+	setupSystemRouteHandler(app)
+
+	if err = app.Listen(":" + port); err != nil && err != http.ErrServerClosed {
+		log.Fatal(fmt.Sprintf("listen: %s\n", err))
+	}
+}
+
+func setupSystemRouteHandler(app *fiber.App) {
+	// 404 Handler
+	app.Use(func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusNotFound).SendString("!")
+	})
 }

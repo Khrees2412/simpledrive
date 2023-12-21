@@ -1,4 +1,4 @@
-package utils
+package util
 
 import (
 	"fmt"
@@ -19,12 +19,13 @@ var (
 func connectAWS() *session.Session {
 	sess, err := session.NewSession(
 		&aws.Config{
-			Region:      aws.String("eu-west-2"),
+			Region:      aws.String("eu-north-1"),
 			Credentials: credentials.NewStaticCredentials(AwsAccessKey, AwsSecretKey, ""),
 		})
 	if err != nil {
 		panic(err)
 	}
+
 	return sess
 }
 
